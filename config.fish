@@ -14,7 +14,7 @@ end
 set -x LANG ja_JP.UTF-8
 
 set SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
-if test -S $SSH_AUTH_SOCK -a ! -L $SSH_AUTH_SOCK
+if test -S "$SSH_AUTH_SOCK"; and test ! -L "$SSH_AUTH_SOCK"
     ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     set -x SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
 else if test -S $SSH_AUTH_SOCK_SYMLINK
