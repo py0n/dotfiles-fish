@@ -25,4 +25,5 @@ end
 # https://github.com/ithinkihaveacat/dotfiles/blob/master/fish/solarized.fish
 source {$configdir}/fish/resources/solarized.fish
 
+# https://github.com/fish-shell/fish-shell/blob/master/share/tools/web_config/sample_prompts/informative_vcs.fish
 source {$configdir}/fish/resources/informative_vcs.fish
