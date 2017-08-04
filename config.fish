@@ -29,3 +29,13 @@ source {$configdir}/fish/resources/solarized.fish
 
 # https://github.com/fish-shell/fish-shell/blob/master/share/tools/web_config/sample_prompts/informative_vcs.fish
 source {$configdir}/fish/resources/informative_vcs.fish
+
+# Go {{{
+if test -d $HOME/.goenv
+    set -x GOENV_ROOT $HOME/.goenv
+    set -x GOPATH $HOME/go
+    status --is-interactive; and source (goenv init -|psub)
+end
+# }}}
+
+# vim: foldmethod=marker
