@@ -13,17 +13,21 @@ end
 
 # login shell {{{
 if status --is-login
-    set -x LANG ja_JP.UTF-8
+    set -gx LANG ja_JP.UTF-8
 
-    set -x FZF_DEFAULT_OPTS '--ansi'
+    set -gx FZF_DEFAULT_OPTS '--ansi'
 
+    # ssh-agent {{{
     set SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
     if test -S "$SSH_AUTH_SOCK"; and test ! -L "$SSH_AUTH_SOCK"
         ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-        set -x SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
+        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     else if test -S $SSH_AUTH_SOCK_SYMLINK
-        set -x SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
+        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
+    else
+        eval ( ssh-agent -c | grep '^setenv' | string replace -r '$' ';' )
     end
+    # }}}
 
     # solarized
     # https://github.com/ithinkihaveacat/dotfiles/blob/master/fish/solarized.fish
@@ -34,8 +38,8 @@ if status --is-login
 
     # Go {{{
     if test -d $HOME/.goenv
-        set -x GOENV_ROOT $HOME/.goenv
-        set -x GOPATH $HOME/go
+        set -gx GOENV_ROOT $HOME/.goenv
+        set -gx GOPATH $HOME/go
         status --is-interactive; and source (goenv init -|psub)
     end
     # }}}
@@ -43,7 +47,7 @@ if status --is-login
     # PATHの重複を除去 {{{
     # http://qiita.com/arcizan/items/9cf19cd982fa65f87546
     # http://qiita.com/itkr/items/1b868d75e54802e8d11a
-    set -x PATH ( echo $PATH | tr ' ' '\n' | awk '!a[$0]++' )
+    set -gx PATH ( echo $PATH | tr ' ' '\n' | awk '!a[$0]++' )
     # }}}
 
 end
