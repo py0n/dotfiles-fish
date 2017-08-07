@@ -38,4 +38,10 @@ if test -d $HOME/.goenv
 end
 # }}}
 
+# PATHの重複を除去 {{{
+# http://qiita.com/arcizan/items/9cf19cd982fa65f87546
+# http://qiita.com/itkr/items/1b868d75e54802e8d11a
+set -x PATH ( echo $PATH | tr ' ' '\n' | awk '!a[$0]++' )
+# }}}
+
 # vim: foldmethod=marker
