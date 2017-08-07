@@ -80,8 +80,11 @@ function fish_prompt --description 'Write out the prompt'
             set suffix '%'
     end
 
-    # USER and Host
-    echo -n (whoami)'@'(hostname -s)':'
+    # hostname
+    set_color $fish_color_hostname
+    echo -n (hostname -s)
+    set_color normal
+    echo -n ':'
 
     # PWD
     set_color $color_cwd
