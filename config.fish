@@ -18,14 +18,19 @@ if status --is-login
     set -gx FZF_DEFAULT_OPTS '--ansi'
 
     # ssh-agent {{{
-    set SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
+    set -l SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
     if set -q SSH_AUTH_SOCK; and test -S $SSH_AUTH_SOCK; and test ! -L $SSH_AUTH_SOCK
         ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
         set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     else if test -S $SSH_AUTH_SOCK_SYMLINK
         set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-    else
-        eval ( ssh-agent -c | grep '^setenv' | string replace -r '$' ';' )
+    end
+
+    command ssh-add -L >/dev/null ^&1
+    if test $status -ne '0'
+        eval (ssh-agent -c | grep '^setenv')
+        ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
+        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     end
     # }}}
 
