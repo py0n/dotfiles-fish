@@ -19,7 +19,7 @@ if status --is-login
 
     # ssh-agent {{{
     set SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
-    if test -S "$SSH_AUTH_SOCK"; and test ! -L "$SSH_AUTH_SOCK"
+    if set -q SSH_AUTH_SOCK; and test -S $SSH_AUTH_SOCK; and test ! -L $SSH_AUTH_SOCK
         ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
         set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     else if test -S $SSH_AUTH_SOCK_SYMLINK
