@@ -1,11 +1,11 @@
 # from share/fish/config.fish
-set -l configdir ~/.config
+set -g configdir ~/.config
 
 if set -q XDG_CONFIG_HOME
     set configdir $XDG_CONFIG_HOME
 end
 
-set -l userdatadir ~/.local/share
+set -g userdatadir ~/.local/share
 
 if set -q XDG_DATA_HOME
     set userdatadir $XDG_DATA_HOME
@@ -43,12 +43,24 @@ if status --is-interactive
     end
     # }}}
 
-    # solarized
-    # https://github.com/ithinkihaveacat/dotfiles/blob/master/fish/solarized.fish
-    source {$configdir}/fish/resources/solarized.fish
+    # resources
+    for f in {$configdir}/fish/resources/*.fish
+        source $f
+    end
 
-    # https://github.com/fish-shell/fish-shell/blob/master/share/tools/web_config/sample_prompts/informative_vcs.fish
-    source {$configdir}/fish/resources/informative_vcs.fish
+    function resource_disable -a name
+        set -l f {$configdir}/fish/resources/{$name}.fish
+        if test -f $f
+            command mv {$configdir}/fish/resources/{$name}.fish {$configdir}/fish/resources/{$name}.fish_
+        end
+    end
+
+    function resource_enable -a name
+        set -l f {$configdir}/fish/resources/{$name}.fish_
+        if test -f $f
+            command mv {$configdir}/fish/resources/{$name}.fish_ {$configdir}/fish/resources/{$name}.fish
+        end
+    end
 
     # Go {{{
     if test -d $HOME/.goenv
