@@ -11,6 +11,11 @@ if set -q XDG_DATA_HOME
     set userdatadir $XDG_DATA_HOME
 end
 
+# Bash on Ubuntu on Windows
+if string match -q -r 'Linux' (uname -a); and string match -q -r 'Microsoft' (uname -a)
+    umask 0022
+end
+
 # login shell {{{
 if status --is-login
     set -gx LANG ja_JP.UTF-8
