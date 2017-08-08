@@ -16,8 +16,8 @@ if string match -q -r 'Linux' (uname -a); and string match -q -r 'Microsoft' (un
     umask 0022
 end
 
-# login shell {{{
-if status --is-login
+# interactive shell {{{
+if status --is-interactive
     set -gx LANG ja_JP.UTF-8
 
     set -gx FZF_DEFAULT_OPTS '--ansi'
