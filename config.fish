@@ -18,9 +18,13 @@ end
 
 # interactive shell {{{
 if status --is-interactive
-    set -gx LANG ja_JP.UTF-8
-
+    if type -q nvim
+        set -gx EDITOR nvim
+    else if type -q vim
+        set -gx EDITOR vim
+    end
     set -gx FZF_DEFAULT_OPTS '--ansi'
+    set -gx LANG ja_JP.UTF-8
 
     # ssh-agent {{{
     set -l SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
