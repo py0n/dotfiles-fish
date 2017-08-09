@@ -70,12 +70,8 @@ if status --is-interactive
     end
     # }}}
 
-    # PATHの重複を除去 {{{
-    # http://qiita.com/arcizan/items/9cf19cd982fa65f87546
-    # http://qiita.com/itkr/items/1b868d75e54802e8d11a
-    set -gx PATH ( echo $PATH | tr ' ' '\n' | awk '!a[$0]++' )
-    # }}}
-
+    # Remove duplicate elements from PATH
+    set -gx PATH (for i in $PATH; echo $i; end | awk '!a[$0]++{print}')
 end
 # }}}
 
