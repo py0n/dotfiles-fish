@@ -70,8 +70,9 @@ if status --is-interactive
     end
     # }}}
 
-    # Remove duplicate elements from PATH
+    # Remove duplicate elements from PATH {{{
     set -gx PATH (for i in $PATH; echo $i; end | awk '!a[$0]++{print}')
+    # }}}
 end
 # }}}
 
