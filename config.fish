@@ -62,11 +62,11 @@ if status --is-interactive
         end
     end
 
-    # Go {{{
+    # goenv {{{
     if test -d $HOME/.goenv
         set -gx GOENV_ROOT $HOME/.goenv
         set -gx GOPATH $HOME/go
-        status --is-interactive; and source (goenv init -|psub)
+        source (goenv init -|psub)
     end
     # }}}
 
