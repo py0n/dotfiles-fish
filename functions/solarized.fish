@@ -1,9 +1,9 @@
-# Defined in /tmp/fish.2XF7ke/solarized.fish @ line 1
-function solarized
+# Defined in /tmp/fish.0E3JPd/solarized.fish @ line 2
+function solarized --argument is_solarized_term
 	# https://github.com/ithinkihaveacat/dotfiles/blob/master/fish/solarized.fish
 	# http://ethanschoonover.com/solarized#the-values
 
-	if test -z "$NO_SOLARIZED_TERM"
+	if test -n "$is_solarized_term"
 		# Use these settings if you've applied a Solarized theme to your terminal (for
 		# example, if "ls -G" produces Solarized output). i.e. if "blue" is #268bd2, not
 		# whatever the default is. (See "../etc/Solarized Dark.terminal" for OS X.)
