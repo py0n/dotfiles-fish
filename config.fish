@@ -63,9 +63,10 @@ if status --is-interactive
     end
 
     # goenv {{{
+    # https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
     if test -d $HOME/.goenv
         set -gx GOENV_ROOT $HOME/.goenv
-        set -gx GOPATH $HOME/go
+        set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
         source (goenv init -|psub)
     end
     # }}}
