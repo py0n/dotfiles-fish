@@ -27,7 +27,7 @@ if status --is-interactive
 end
 # }}}
 
-# ssh-agent (at interactive shell){{
+# ssh-agent (at interactive shell) {{{
 if status --is-interactive
     set -l SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
     if set -q SSH_AUTH_SOCK; and test -S $SSH_AUTH_SOCK; and test ! -L $SSH_AUTH_SOCK
