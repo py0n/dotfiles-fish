@@ -1,31 +1,34 @@
 # from share/fish/config.fish
 set -g configdir ~/.config
-
-if set -q XDG_CONFIG_HOME
-    set configdir $XDG_CONFIG_HOME
-end
-
 set -g userdatadir ~/.local/share
 
-if set -q XDG_DATA_HOME
-    set userdatadir $XDG_DATA_HOME
-end
+# environments {{{
+set -q XDG_CONFIG_HOME; and set configdir   $XDG_CONFIG_HOME
+set -q XDG_DATA_HOME;   and set userdatadir $XDG_DATA_HOME
+# }}}
 
 # Bash on Ubuntu on Windows
 if string match -q -r 'Linux' (uname -a); and string match -q -r 'Microsoft' (uname -a)
     umask 0022
 end
 
+# environments (at interactive) {{{
+if status --is-interactive
+    # EDITOR
+    type -q vim;  and set -gx EDITOR vim
+    type -q nvim; and set -gx EDITOR nvim
+    # FZF
+    set -gx FZF_DEFAULT_OPTS '--ansi'
+    # GOARCH, GOOSが設定されていたら削除
+    set -e GOARCH
+    set -e GOOS
+    # LANG
+    set -gx LANG ja_JP.UTF-8
+end
+# }}}
+
 # interactive shell {{{
 if status --is-interactive
-    if type -q nvim
-        set -gx EDITOR nvim
-    else if type -q vim
-        set -gx EDITOR vim
-    end
-    set -gx FZF_DEFAULT_OPTS '--ansi'
-    set -gx LANG ja_JP.UTF-8
-
     # ssh-agent {{{
     set -l SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
     if set -q SSH_AUTH_SOCK; and test -S $SSH_AUTH_SOCK; and test ! -L $SSH_AUTH_SOCK
