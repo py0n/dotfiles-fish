@@ -61,38 +61,52 @@ if status --is-interactive
             command mv {$configdir}/fish/resources/{$name}.fish_ {$configdir}/fish/resources/{$name}.fish
         end
     end
+end
+# }}}
 
-    # goenv {{{
-    # https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
-    if test -d $HOME/.goenv
-        set -gx GOENV_ROOT $HOME/.goenv
-        set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
-        source (goenv init -|psub)
-    end
-    # }}}
+# *env {{{
+# goenv {{{
+# https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
+if status --is-interactive; and test -d $HOME/.goenv
+    set -gx GOENV_ROOT $HOME/.goenv
+    set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
+    source (goenv init -|psub)
+end
+# }}}
 
-    # ndenv {{{
-        set -gx PATH $HOME/.ndenv/shims $PATH
-        # 'ndenv init -' がfishに対応していないので茲に内容を記載
-        # https://github.com/riywo/ndenv/pull/14
-        # https://github.com/riywo/ndenv/pull/15
-        # など、PRが出てゐるが取り込まれてゐない。
-        command ndenv rehash 2> /dev/null
-        function ndenv
-            set command $argv[1]
-            set -e argv[1]
-            switch "$command"
-            case rehash shell
-                source (ndenv "sh-$command" $argv|psub)
-            case '*'
-                command ndenv "$command" $argv
-            end
+# ndenv {{{
+# https://github.com/riywo/ndenv#install
+if status --is-interactive; and test -d $HOME/.ndenv
+    set -gx PATH $HOME/.ndenv/shims $PATH
+    # 'ndenv init -' がfishに対応していないので茲に内容を記載
+    # https://github.com/riywo/ndenv/pull/14
+    # https://github.com/riywo/ndenv/pull/15
+    # など、PRが出てゐるが取り込まれてゐない。
+    command ndenv rehash 2> /dev/null
+    function ndenv
+        set command $argv[1]
+        set -e argv[1]
+        switch "$command"
+        case rehash shell
+            source (ndenv "sh-$command" $argv|psub)
+        case '*'
+            command ndenv "$command" $argv
         end
-    # }}}
+    end
+end
+# }}}
 
-    # Remove duplicate elements from PATH {{{
+# rbenv {{{
+# https://github.com/rbenv/rbenv#basic-github-checkout
+if status --is-interactive; and test -d $HOME/.rbenv
+    source (rbenv init -|psub)
+end
+# }}}
+# }}}
+
+# Remove duplicate elements from PATH {{{
+if status --is-interactive
     set -gx PATH (for i in $PATH; echo $i; end | awk '!a[$0]++{print}')
-    # }}}
 end
 # }}}
 
