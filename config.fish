@@ -69,7 +69,7 @@ end
 
 # $HOME/*rc {{{
 if status --is-interactive
-    for f in {$configdir}/fish/extra/*rc
+    for f in {$configdir}/fish/extra/*
         ln -sfn $f $HOME/.(string split '/' $f)[-1]
     end
 end

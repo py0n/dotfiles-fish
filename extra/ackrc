@@ -1,0 +1,4 @@
+--ignore-dir=.git
+--ignore-dir=.svn
+--ignore-dir=CVS
+--sort-files
