@@ -5,3 +5,8 @@
 set vertical-split = no
 # デフォルト値
 # set vertical-split = auto
+
+# tigでgit reBase -i出来るように
+# https://qiita.com/numanomanu/items/513d62fb4a7921880085
+bind diff B !git rebase -i %(commit)
+bind main B !git rebase -i %(commit)
