@@ -67,6 +67,14 @@ if status --is-interactive
 end
 # }}}
 
+# $HOME/*rc {{{
+if status --is-interactive
+    for f in {$configdir}/fish/extra/*rc
+        ln -sfn $f $HOME/.(string split '/' $f)[-1]
+    end
+end
+# }}}
+
 # *env (at interactive shell) {{{
 # goenv {{{
 # https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
