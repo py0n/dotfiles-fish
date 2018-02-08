@@ -78,7 +78,7 @@ end
 # *env (at interactive shell) {{{
 # goenv {{{
 # https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
-if status --is-interactive; and test -d $HOME/.goenv
+if status --is-interactive; and test -x $HOME/.goenv/bin/goenv
     set -gx GOENV_ROOT $HOME/.goenv
     set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
     source (goenv init -|psub)
@@ -87,7 +87,7 @@ end
 
 # ndenv {{{
 # https://github.com/riywo/ndenv#install
-if status --is-interactive; and test -d $HOME/.ndenv
+if status --is-interactive; and test -x $HOME/.ndenv/bin/ndenv
     set -gx PATH $HOME/.ndenv/shims $PATH
     # 'ndenv init -' がfishに対応していないので茲に内容を記載
     # https://github.com/riywo/ndenv/pull/14
@@ -119,7 +119,7 @@ end
 
 # rbenv {{{
 # https://github.com/rbenv/rbenv#basic-github-checkout
-if status --is-interactive; and test -d $HOME/.rbenv
+if status --is-interactive; and test -x $HOME/.rbenv/bin/rbenv
     source (rbenv init -|psub)
 end
 # }}}
