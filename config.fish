@@ -107,6 +107,16 @@ if status --is-interactive; and test -d $HOME/.ndenv
 end
 # }}}
 
+# pyenv {{{
+# https://github.com/pyenv/pyenv#installation
+if status --is-interactive; and test -x $HOME/.pyenv/bin/pyenv
+    set -x PYENV_ROOT $HOME/.pyenv
+    # fish_user_pathsに追加していればPATHへの追加は不要
+    # set -x PATH $PYENV_ROOT/bin $PATH
+    source (pyenv init -|psub)
+end
+# }}}
+
 # rbenv {{{
 # https://github.com/rbenv/rbenv#basic-github-checkout
 if status --is-interactive; and test -d $HOME/.rbenv
