@@ -114,13 +114,6 @@ if status --is-interactive; and test -x $HOME/.ndenv/bin/ndenv
     end
 end
 # }}}
-
-# rbenv {{{
-# https://github.com/rbenv/rbenv#basic-github-checkout
-if status --is-interactive; and test -x $HOME/.rbenv/bin/rbenv
-    source (rbenv init -|psub)
-end
-# }}}
 # }}}
 
 # Remove duplicate elements from PATH (at interactive shell) {{{
