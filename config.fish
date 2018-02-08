@@ -75,13 +75,21 @@ if status --is-interactive
 end
 # }}}
 
-# *env (at interactive shell) {{{
-# goenv {{{
-# https://qiita.com/spiegel-im-spiegel/items/c140fc1fe02aa24be4fd
-if status --is-interactive; and test -x $HOME/.goenv/bin/goenv
-    set -gx GOENV_ROOT $HOME/.goenv
+# go {{{
+if status --is-interactive
+    test -d $HOME/go-packages;  or mkdir -p $HOME/go-packages/{bin,pkg,src}
+    test -d $HOME/go-workspace; or mkdir -p $HOME/go-workspace/{bin,pkg,src}
     set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
-    source (goenv init -|psub)
+end
+# }}}
+
+# *env (at interactive shell) {{{
+# https://github.com/riywo/anyenv#install
+# anyenv {{{
+if status --is-interactive; and test -x $HOME/.anyenv/bin/anyenv
+    # fish_user_pathsに追加していればPATHへの追加は不要
+    # set -x PATH $HOME/.anyenv/bin $PATH
+    source (anyenv init -|psub)
 end
 # }}}
 
@@ -104,23 +112,6 @@ if status --is-interactive; and test -x $HOME/.ndenv/bin/ndenv
             command ndenv "$command" $argv
         end
     end
-end
-# }}}
-
-# pyenv {{{
-# https://github.com/pyenv/pyenv#installation
-if status --is-interactive; and test -x $HOME/.pyenv/bin/pyenv
-    set -x PYENV_ROOT $HOME/.pyenv
-    # fish_user_pathsに追加していればPATHへの追加は不要
-    # set -x PATH $PYENV_ROOT/bin $PATH
-    source (pyenv init -|psub)
-end
-# }}}
-
-# rbenv {{{
-# https://github.com/rbenv/rbenv#basic-github-checkout
-if status --is-interactive; and test -x $HOME/.rbenv/bin/rbenv
-    source (rbenv init -|psub)
 end
 # }}}
 # }}}
