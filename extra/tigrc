@@ -1,4 +1,8 @@
 # https://github.com/jonas/tig/blob/master/tigrc
+
+# 2.2.1 以上
+set diff-highlight = true
+
 # 画面を垂直方向に分割する
 # set vertical-split = yes
 # 横分割に強制する
