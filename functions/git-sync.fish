@@ -1,11 +1,11 @@
-# Defined in /tmp/fish.H9yeDE/git-sync.fish @ line 2
+# Defined in /tmp/fish.ZjvUo5/git-sync.fish @ line 2
 function git-sync
 	# setup
 	if type --no-function --quiet git-sync; or true
-        command mkdir -p $HOME/.local/bin
-        echo -e "#!/bin/sh\nfish -c git-sync" > $HOME/.local/bin/git-sync
-        command chmod +x $HOME/.local/bin/git-sync
-    end
+		command mkdir -p $HOME/.local/bin
+		echo -e "#!/bin/sh\nfish -c git-sync" > $HOME/.local/bin/git-sync
+		command chmod +x $HOME/.local/bin/git-sync
+	end
 
 	# git-sync (fish version)
 	#
