@@ -1,4 +1,4 @@
-# Defined in /tmp/fish.vCQYQY/git-sync.fish @ line 2
+# Defined in /tmp/fish.WxkEu2/git-sync.fish @ line 2
 function git-sync
 	# setup
 	type --no-function --quiet git-sync
@@ -32,11 +32,10 @@ function git-sync
 		command git branch -D  (string split --max 1 ' ' $b)[1]
 	end
 
-	if count $modifieds >/dev/null 2>&1
-		if command git checkout $current
-			command git stash pop
-		else
-			command git stash drop
-		end
+
+	if command git checkout $current
+		count $modifieds >/dev/null 2>&1; and command git stash pop
+	else
+		count $modifieds >/dev/null 2>&1; and command git stash drop
 	end
 end
