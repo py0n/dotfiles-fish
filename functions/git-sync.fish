@@ -1,4 +1,4 @@
-# Defined in /tmp/fish.XP7PwJ/git-sync.fish @ line 2
+# Defined in /tmp/fish.gMa1Aa/git-sync.fish @ line 3
 function git-sync
 	# git-sync (fish version)
 	#
