@@ -1,16 +1,16 @@
-# Defined in /tmp/fish.WxkEu2/git-sync.fish @ line 2
+# Defined in /tmp/fish.XP7PwJ/git-sync.fish @ line 2
 function git-sync
-	# setup
-	type --no-function --quiet git-sync
-	if [ $status -ne 0 ]
-		command mkdir -p $HOME/.local/bin
-		echo -e "#!/bin/sh\nfish -c git-sync" > $HOME/.local/bin/git-sync
-		command chmod +x $HOME/.local/bin/git-sync
-	end
-
 	# git-sync (fish version)
 	#
 	# cf. https://qiita.com/masarakki/items/27f2cb456b4801ccb31b
+	#
+	# $HOME/.gitconfig に以下の設定を追加してください
+	#
+	# ```
+	# [alias]
+	#     async = !fish -c git-sync
+	# ```
+
 	command git fetch --all --prune
 
 	set -l modifieds (command git status --porcelain --untracked-files=no | string length)
