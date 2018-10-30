@@ -1,4 +1,4 @@
-# Defined in /tmp/fish.cssELv/R.fish @ line 2
+# Defined in /tmp/fish.GjSzXO/R.fish @ line 2
 function R --description 'fzf ghq list'
-	echo -n (ghq root)/(ghq list | fzf)
+	echo -n (ghq root)/(ghq list | fzf --ansi --cycle)
 end
