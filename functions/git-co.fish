@@ -1,4 +1,4 @@
-# Defined in /tmp/fish.N6nhbW/git-co.fish @ line 2
+# Defined in /tmp/fish.vv4vEQ/git-co.fish @ line 2
 function git-co
 	# git-co
 	#
@@ -15,6 +15,6 @@ function git-co
 	if count $argv >/dev/null
 		command git checkout $argv
 	else
-		command git checkout (git branch -vv | string trim | string replace -r '^\* ' '' | fzf | string split ' ')[1]
+		command git checkout (git branch -vv | string trim | string replace --regex '\A\* ' '' | fzf --ansi --cycle | string split ' ')[1]
 	end
 end
