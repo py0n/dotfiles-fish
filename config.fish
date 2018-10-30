@@ -38,7 +38,7 @@ if status --is-interactive
     end
     command ssh-add -L >/dev/null ^&1
     if test $status -ne '0'
-        eval (ssh-agent -c | grep '^setenv')
+        eval (ssh-agent -c | string replace --regex '\Asetenv' 'set -gx')
         ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
         set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
     end
