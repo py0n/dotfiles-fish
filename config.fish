@@ -15,15 +15,15 @@ end
 # environments (at interactive shell) {{{
 if status --is-interactive
     # EDITOR
-    type -q vim;  and set -gx EDITOR vim
-    type -q nvim; and set -gx EDITOR nvim
+    type --quiet vim;  and set -gx EDITOR vim
+    type --quiet nvim; and set -gx EDITOR nvim
     # FZF
-    set -gx FZF_DEFAULT_OPTS '--ansi'
+    set --global --export FZF_DEFAULT_OPTS '--ansi'
     # GOARCH, GOOSが設定されていたら削除
-    set -e GOARCH
-    set -e GOOS
+    set --erase GOARCH
+    set --erase GOOS
     # LANG
-    set -gx LANG ja_JP.UTF-8
+    set --global --export LANG ja_JP.UTF-8
 end
 # }}}
 
