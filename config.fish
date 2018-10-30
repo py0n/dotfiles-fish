@@ -28,20 +28,57 @@ end
 # }}}
 
 # ssh-agent (at interactive shell) {{{
+function __set_ssh_auth_sock # {{{
+
+    set --local symlink $HOME/.ssh-agent-$USER
+
+    if test -S $SSH_AUTH_SOCK; and not test -L $SSH_AUTH_SOCK
+        command ln -sfn $SSH_AUTH_SOCK $symlink
+        set --global --export SSH_AUTH_SOCK $symlink
+    end
+end # }}}
+
+function __restart_ssh_agent # {{{
+
+    # ssh-agentが複数動いている場合
+    ps acux | grep 'ssh-agent' > /dev/null
+    if test $status -gt 1
+        command killall ssh-agent
+    end
+
+    # SSH_AUTH_SOCK
+    set --query SSH_AUTH_SOCK
+    if test $status -gt 0
+        command killall ssh-agent
+    end
+
+    # SSH_AGENT_PID
+    set --query SSH_AGENT_PID
+    if test $status -gt 0
+        command killall ssh-agent
+    end
+
+    # ssh-agentが動いていない場合
+    ps acux | grep 'ssh-agent' > /dev/null
+    if test $status -gt 0
+        eval (command ssh-agent -c | string replace --regex '\Asetenv' 'set --global --export')
+    end
+
+    set --global --export SSH_AGENT_PID (ps acux | grep 'ssh-agent' | cut -d' ' -f2)
+end # }}}
+
+function reset_ssh_auth_sock # {{{
+
+    set --query SSH_CONNECTION
+    if test $status -gt 0
+        __restart_ssh_agent
+    end
+
+    __set_ssh_auth_sock
+end # }}}
+
 if status --is-interactive
-    set -l SSH_AUTH_SOCK_SYMLINK $HOME/.ssh-agent-$USER
-    if set -q SSH_AUTH_SOCK; and test -S $SSH_AUTH_SOCK; and test ! -L $SSH_AUTH_SOCK
-        ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-    else if test -S $SSH_AUTH_SOCK_SYMLINK
-        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-    end
-    command ssh-add -L >/dev/null ^&1
-    if test $status -ne '0'
-        eval (ssh-agent -c | string replace --regex '\Asetenv' 'set -gx')
-        ln -sfn $SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-        set -gx SSH_AUTH_SOCK $SSH_AUTH_SOCK_SYMLINK
-    end
+    reset_ssh_auth_sock
 end
 # }}}
 
