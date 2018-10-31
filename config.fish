@@ -64,7 +64,7 @@ function __restart_ssh_agent # {{{
         eval (command ssh-agent -c | string replace --regex '\Asetenv' 'set --global --export')
     end
 
-    set --global --export SSH_AGENT_PID (ps acux | grep 'ssh-agent' | cut -d' ' -f2)
+    set --global --export SSH_AGENT_PID (ps acux | grep 'ssh-agent' | awk '{split($0,e," *");print e[2]}')
 end # }}}
 
 function reset_ssh_auth_sock # {{{
