@@ -41,8 +41,7 @@ end # }}}
 function __restart_ssh_agent # {{{
 
     # ssh-agentが複数動いている場合
-    ps acux | grep 'ssh-agent' > /dev/null
-    if test $status -gt 1
+    if test (ps acux | grep 'ssh-agent' | wc -l) -gt 1
         command killall ssh-agent
     end
 
