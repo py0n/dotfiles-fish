@@ -111,6 +111,14 @@ if status --is-interactive
 end
 # }}}
 
+# dir_colors {{{
+if status --is-interactive
+    if test -f $HOME/.dir_colors; and type -q -t dircolors
+        eval (dircolors -c $HOME/.dir_colors)
+    end
+end
+# }}}
+
 # go {{{
 if status --is-interactive
     test -d $HOME/go-packages;  or mkdir -p $HOME/go-packages/{bin,pkg,src}
