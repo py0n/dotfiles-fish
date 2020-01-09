@@ -24,3 +24,12 @@ set main-view = id:width=12 date author commit-title:graph=yes,refs=yes
 # 差分の前後の表示行数(diff-context)を指定
 # https://qiita.com/yoshikazusawa/items/d99e8b5d6f6a45aa6e2e
 set diff-context = 6
+
+# 画面移動
+
+# g: 最初の行
+# G: 最後の行
+# https://qiita.com/yoshikazusawa/items/3eaa6db78fa348d38bfe
+bind generic G move-last-line
+bind generic g move-first-line
+bind main    G move-last-line
