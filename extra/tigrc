@@ -17,6 +17,10 @@ bind main B !git rebase -i %(commit)
 
 # 表示
 
+# 差分の前後の表示行数(diff-context)を指定
+# https://qiita.com/yoshikazusawa/items/d99e8b5d6f6a45aa6e2e
+set diff-context = 6
+
 # main viewの左端にコミットIDを表示する
 # https://qiita.com/yoshikazusawa/items/d99e8b5d6f6a45aa6e2e
 set main-view = id:width=12 date author commit-title:graph=yes,refs=yes
