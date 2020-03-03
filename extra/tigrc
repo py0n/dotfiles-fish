@@ -40,4 +40,4 @@ bind main    G move-last-line
 
 # refs-view
 bind refs T !git checkout -t %(refname)
-bind refs n !git checkout -b %(prompt Enter new branch name: ) %(branch)
+bind refs n ?git checkout -b "%(prompt Enter new branch name: )" %(branch)
