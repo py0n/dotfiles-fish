@@ -1,10 +1,10 @@
-# Defined in /var/folders/jd/dp3g4h052llfp2p75h7lq4685nprdw/T//fish.f4nBBr/G.fish @ line 2
+# Defined in /var/folders/jd/dp3g4h052llfp2p75h7lq4685nprdw/T//fish.yXJx37/G.fish @ line 2
 function G --description 'narrow down git-grep'
 	if not count $argv >/dev/null
 		return 1
 	end
 
-	if set --query TMUX; and type --query --no-functions fzf-tmux
+	if set --query TMUX; and type -q --no-functions fzf-tmux
 		set cmd_fzf fzf-tmux
 	else
 		set cmd_fzf fzf
