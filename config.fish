@@ -113,7 +113,7 @@ end
 
 # dir_colors {{{
 if status --is-interactive
-    if test -f $HOME/.dir_colors; and type --query -t dircolors
+    if test -f $HOME/.dir_colors; and type --query dircolors
         eval (dircolors -c $HOME/.dir_colors)
     end
 end
