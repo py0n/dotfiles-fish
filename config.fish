@@ -15,8 +15,8 @@ end
 # environments (at interactive shell) {{{
 if status --is-interactive
     # EDITOR
-    type --quiet vim;  and set -gx EDITOR vim
-    type --quiet nvim; and set -gx EDITOR nvim
+    type --query vim;  and set -gx EDITOR vim
+    type --query nvim; and set -gx EDITOR nvim
     # FZF
     set --global --export FZF_DEFAULT_OPTS '--ansi'
     # GOARCH, GOOSが設定されていたら削除
@@ -113,7 +113,7 @@ end
 
 # dir_colors {{{
 if status --is-interactive
-    if test -f $HOME/.dir_colors; and type -q -t dircolors
+    if test -f $HOME/.dir_colors; and type --query -t dircolors
         eval (dircolors -c $HOME/.dir_colors)
     end
 end
