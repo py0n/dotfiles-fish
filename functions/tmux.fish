@@ -1,6 +1,6 @@
-# Defined in /var/folders/jd/dp3g4h052llfp2p75h7lq4685nprdw/T//fish.Jo0vuq/tmux.fish @ line 2
+# Defined in /var/folders/jd/dp3g4h052llfp2p75h7lq4685nprdw/T//fish.nAm4cO/tmux.fish @ line 2
 function tmux --description 'tmux with auto-attaching'
-	if not type -f -p -q tmux
+	if not type -f -q tmux
 		return 1
 	end
 
