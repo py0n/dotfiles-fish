@@ -7,9 +7,6 @@ set -g userdatadir ~/.local/share
 
 set -q XDG_DATA_HOME; and set userdatadir $XDG_DATA_HOME
 
-# for ddc-nextword
-# https://github.com/Shougo/ddc-nextword
-set -g NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
 
 # Bash on Ubuntu on Windows
 if string match -q -r 'Linux' (uname -a); and string match -q -r 'Microsoft' (uname -a)
@@ -28,6 +25,9 @@ if status --is-interactive
     set --erase GOOS
     # LANG
     set --global --export LANG ja_JP.UTF-8
+
+    # ddc-nextword: https://github.com/Shougo/ddc-nextword
+    type -q nextword; set -g NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
 end
 # }}}
 
