@@ -115,6 +115,12 @@ if status --is-interactive
 end
 # }}}
 
+# deno {{{
+if status --is-interactive
+    set -gx DENO_INSTALL $HOME/.deno
+end
+# }}}
+
 # dir_colors {{{
 if status --is-interactive
     if test -f $HOME/.dir_colors; and type -q dircolors
