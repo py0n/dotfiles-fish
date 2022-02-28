@@ -27,7 +27,7 @@ if status --is-interactive
     set --global --export LANG ja_JP.UTF-8
 
     # ddc-nextword: https://github.com/Shougo/ddc-nextword
-    type -q nextword; set -g NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
+    type -q nextword; set -gx NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
 end
 # }}}
 
