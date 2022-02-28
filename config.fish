@@ -129,14 +129,6 @@ if status --is-interactive
 end
 # }}}
 
-# go {{{
-if status --is-interactive
-    test -d $HOME/go-packages;  or mkdir -p $HOME/go-packages/{bin,pkg,src}
-    test -d $HOME/go-workspace; or mkdir -p $HOME/go-workspace/{bin,pkg,src}
-    set -gx GOPATH $HOME/go-packages:$HOME/go-workspace
-end
-# }}}
-
 # *env (at interactive shell) {{{
 # https://github.com/riywo/anyenv#install
 # anyenv {{{
