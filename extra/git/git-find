@@ -8,7 +8,7 @@ if set --query TMUX; and type -q --no-functions fzf-tmux
 else
     set cmd_fzf fzf
 end
-set -l array (command git grep -inP $argv | command $cmd_fzf --ansi --cycle --layout=reverse-list | string split -m2 ':')
+set -l array (command git grep --color=always -inP $argv | command $cmd_fzf --ansi --cycle --layout=reverse-list | string split -m2 ':')
 
 if count $array >/dev/null
     command nvim "+$array[2]" "$array[1]"
