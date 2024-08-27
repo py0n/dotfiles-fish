@@ -3,12 +3,6 @@
 #
 # cf. https://qiita.com/masarakki/items/27f2cb456b4801ccb31b
 #
-# $HOME/.gitconfig に以下の設定を追加してください
-#
-# ```
-# [alias]
-#     async = !fish -c git-sync
-# ```
 
 command git fetch --all --prune
 
@@ -20,7 +14,7 @@ end
 
 set -l current (command git branch | string match --entire --regex '^\* ' | string split ' ')[2]
 
-command git checkout master
+command git checkout main 2>/dev/null; or command git checkout master 2>/dev/null
 command git pull --rebase
 
 for b in (command git branch --no-color --merged | string match --entire --invert --regex '^\* ' | string trim)
