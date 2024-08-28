@@ -1,15 +1,18 @@
 #!/usr/bin/env fish
-if not count $argv
-    return 1
-end
-
 if set --query TMUX; and type -q --no-functions fzf-tmux
     set cmd_fzf fzf-tmux
 else
     set cmd_fzf fzf
 end
-set -l array (command git grep --color=always -inP $argv | command $cmd_fzf --ansi --cycle --layout=reverse-list | string split -m2 ':')
 
-if count $array >/dev/null
-    command nvim "+$array[2]" "$array[1]"
+if not count $argv >/dev/null
+    set -l fname (command git ls-files | command $cmd_fzf --cycle --layout=reverse-list)
+    if count $fname >/dev/null
+        command nvim $fname
+    end
+else
+    set -l array (command git grep --color=always -inP $argv | command $cmd_fzf --ansi --cycle --layout=reverse-list | string split -m2 ':')
+    if count $array >/dev/null
+        command nvim "+$array[2]" "$array[1]"
+    end
 end
