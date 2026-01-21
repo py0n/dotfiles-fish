@@ -251,11 +251,16 @@ end
 
 
 # ============================================================
-# PATH の重複削除
+# PATH の重複削除（外部コマンドを使わない）
 # ============================================================
 if status --is-interactive
-    # PATH の順序を保ったまま重複を削除
-    set -gx PATH (for i in $PATH; echo $i; end | awk '!a[$0]++{print}')
+    set -l new_path
+    for p in $PATH
+        if not contains -- $p $new_path
+            set -a new_path $p
+        end
+    end
+    set -gx PATH $new_path
 end
 
 
