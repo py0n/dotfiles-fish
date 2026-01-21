@@ -1,4 +1,8 @@
-# Defined in /tmp/fish.YSu1Qe/F.fish @ line 2
 function F --description 'fzf git-ls-files'
-	echo -n ( git ls-files | fzf --ansi --cycle)
+    if not type -q git; or not type -q fzf
+        return 1
+    end
+    command git rev-parse --is-inside-work-tree >/dev/null 2>&1; or return 1
+
+    command git ls-files | fzf --ansi --cycle
 end

@@ -1,149 +1,186 @@
-# from share/fish/config.fish
-set -g configdir ~/.config
+# ============================================================
+# ~/.config/fish/config.fish  (fish 4.3.3)
+#
+# 方針:
+# - config.fish はログイン/非ログイン問わず読み込まれる
+# - 対話シェル専用の設定は `status --is-interactive` で切り分ける
+# - 起動を重くする外部コマンド（anyenv init / dircolors / ps 等）は
+#   可能ならキャッシュ化・条件付き実行にする
+# ============================================================
 
+
+# ------------------------------------------------------------
+# XDG Base Directory 対応
+# ------------------------------------------------------------
+# fish が参照する config / data ディレクトリを XDG_*_HOME に合わせる
+# （XDG_*_HOME が未設定なら従来の ~/.config / ~/.local/share を使う）
+set -g configdir ~/.config
 set -q XDG_CONFIG_HOME; and set configdir $XDG_CONFIG_HOME
 
 set -g userdatadir ~/.local/share
-
 set -q XDG_DATA_HOME; and set userdatadir $XDG_DATA_HOME
 
 
-# Bash on Ubuntu on Windows
+# ------------------------------------------------------------
+# WSL (Linux on Windows) 判定
+# ------------------------------------------------------------
+# WSL 環境では umask が期待と違うことがあるため明示指定
 if string match -q -r 'Linux' (uname -a); and string match -q -r 'Microsoft' (uname -a)
     umask 0022
 end
 
-# environments (at interactive shell) {{{
-if status --is-interactive
-    # EDITOR
-    type -q vim;  and set -gx EDITOR vim
-    type -q nvim; and set -gx EDITOR nvim
-    # FZF
-    set --global --export FZF_DEFAULT_OPTS '--ansi'
-    # GOARCH, GOOSが設定されていたら削除
-    set --erase GOARCH
-    set --erase GOOS
-    # LANG
-    set --global --export LANG ja_JP.UTF-8
 
-    # ddc-nextword: https://github.com/Shougo/ddc-nextword
-    type -q nextword; set -gx NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
-end
-# }}}
+# interactive 以外はここで終了（スクリプト実行等を軽く）
+status --is-interactive; or exit
 
-# ssh-agent (at interactive shell) {{{
-function __set_ssh_auth_sock # {{{
+# ============================================================
+# interactive shell 用の環境設定
+# ============================================================
 
-    set --local symlink $HOME/.ssh-agent-$USER
+# キャッシュ保存先（XDG_CACHE_HOME 優先）
+# - dircolors / anyenv の初期化結果を保存して、普段は source だけで済ませる
+set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
 
-    if test -S $SSH_AUTH_SOCK; and not test -L $SSH_AUTH_SOCK
-        command ln -sfn $SSH_AUTH_SOCK $symlink
-        set --global --export SSH_AUTH_SOCK $symlink
-    end
-end # }}}
 
-function __restart_ssh_agent # {{{
+# --------------------------------------------------------
+# fish 4.3+ 移行メモ（universal → global）
+# --------------------------------------------------------
+# fish 4.3 以降では fish_color_* / fish_pager_color_* / fish_key_bindings が
+# universal ではなく global 変数として扱われる。
+# upgrade 時に conf.d/fish_frozen_*.fish が生成されることがあるが、
+# 現在はそれらを使わず（削除済みの想定）、必要ならここや conf.d 側で明示設定する。
 
-    # ssh-agentが複数動いている場合
-    if test (ps acux | grep 'ssh-agent' | wc -l) -gt 1
-        command killall ssh-agent
-    end
+# キーバインド（デフォルトを使う場合はコメントのままで良い）
+# set --global fish_key_bindings fish_default_key_bindings
 
-    # SSH_AUTH_SOCK
-    set --query SSH_AUTH_SOCK
-    if test $status -gt 0
-        command killall ssh-agent
-    end
 
-    # SSH_AGENT_PID
-    set --query SSH_AGENT_PID
-    if test $status -gt 0
-        command killall ssh-agent
-    end
+# --------------------------------------------------------
+# EDITOR 設定
+# --------------------------------------------------------
+# vim / nvim があればそちらを優先
+type -q vim;  and set -gx EDITOR vim
+type -q nvim; and set -gx EDITOR nvim
 
-    # ssh-agentが動いていない場合
-    ps acux | grep 'ssh-agent' > /dev/null
-    if test $status -gt 0
-        eval (command ssh-agent -c | string replace --regex '\Asetenv' 'set --global --export')
-    end
 
-    set --global --export SSH_AGENT_PID (ps acux | grep 'ssh-agent' | awk '{split($0,e," *");print e[2]}')
-end # }}}
+# --------------------------------------------------------
+# fzf 設定
+# --------------------------------------------------------
+# ANSI カラーを有効化
+set --global --export FZF_DEFAULT_OPTS '--ansi'
 
-function reset_ssh_auth_sock # {{{
 
-    set --query SSH_CONNECTION
-    if test $status -gt 0
-        __restart_ssh_agent
-    end
+# --------------------------------------------------------
+# Go 環境変数の掃除
+# --------------------------------------------------------
+# shell 起動時に GOARCH / GOOS が残っているとビルド事故の原因になるため削除
+set --erase GOARCH
+set --erase GOOS
 
-    __set_ssh_auth_sock
-end # }}}
 
-if status --is-interactive
+# --------------------------------------------------------
+# ロケール
+# --------------------------------------------------------
+set --global --export LANG ja_JP.UTF-8
+
+
+# --------------------------------------------------------
+# ddc-nextword 用設定
+# --------------------------------------------------------
+# コマンドが存在する場合のみ環境変数を設定
+type -q nextword; and set -gx NEXTWORD_DATA_PATH $HOME/.local/share/nextword-data-large
+
+
+# ============================================================
+# ssh-agent 管理（対話シェル）
+# - SSH_AUTH_SOCK が有効なら何もしない（起動を軽くする）
+# ============================================================
+if set -q SSH_AUTH_SOCK; and test -S "$SSH_AUTH_SOCK"
+    # OK
+else
+    # sock が無い/死んでる時だけ起動・修復
     reset_ssh_auth_sock
 end
-# }}}
 
-# resources (at interactive shell) {{{
-if status --is-interactive
-    for f in {$configdir}/fish/resources/*.fish
-        source $f
-    end
 
-    function resource_disable -a name
-        set -l f {$configdir}/fish/resources/{$name}.fish
-        if test -f $f
-            command mv {$configdir}/fish/resources/{$name}.fish {$configdir}/fish/resources/{$name}.fish_
-        end
-    end
+# ============================================================
+# resources の読み込み（対話シェル）
+# - resources は任意拡張（prompt など）を分離して置く場所
+# - glob で全部 source すると増えるほど遅くなるので、必要なものだけ読む
+# ============================================================
+set -l resdir $configdir/fish/resources
 
-    function resource_enable -a name
-        set -l f {$configdir}/fish/resources/{$name}.fish_
-        if test -f $f
-            command mv {$configdir}/fish/resources/{$name}.fish_ {$configdir}/fish/resources/{$name}.fish
-        end
-    end
+# 必要なものだけ読み込む
+if test -r "$resdir/informative_vcs.fish"
+    source "$resdir/informative_vcs.fish"
 end
-# }}}
 
-# $HOME/*rc {{{
-if status --is-interactive
-    for f in {$configdir}/fish/extra/rc/*
-        ln -sfn $f $HOME/.(string split '/' $f)[-1]
-    end
-end
-# }}}
 
-# deno {{{
-if status --is-interactive
-    set -gx DENO_INSTALL $HOME/.deno
-end
-# }}}
-
-# dir_colors {{{
-if status --is-interactive
-    if test -f $HOME/.dir_colors; and type -q dircolors
-        eval (dircolors -c $HOME/.dir_colors)
+# ============================================================
+# extra/rc の展開（初回のみ）
+# - ~/.config/fish/extra/rc/* を ~/.<name> に symlink する
+# - 起動のたびに ln -sfn で上書きすると重い＆副作用が大きいので、
+#   ここでは「無ければ作る」だけにしている
+# - 内容を更新したいときは update_rc_links（手動）を使う
+# ============================================================
+# すでに存在するものは触らない（起動を軽くする）
+for f in $configdir/fish/extra/rc/*
+    set -l name (path basename $f)
+    set -l dst  "$HOME/.$name"
+    if not test -e $dst
+        command ln -s $f $dst
     end
 end
-# }}}
 
-# *env (at interactive shell) {{{
-# https://github.com/riywo/anyenv#install
-# anyenv {{{
-if status --is-interactive; and test -x $HOME/.anyenv/bin/anyenv
-    # fish_user_pathsに追加していればPATHへの追加は不要
-    # set -x PATH $HOME/.anyenv/bin $PATH
-    source (anyenv init -|psub)
-end
-# }}}
-# }}}
 
-# Remove duplicate elements from PATH (at interactive shell) {{{
-if status --is-interactive
-    set -gx PATH (for i in $PATH; echo $i; end | awk '!a[$0]++{print}')
+# ============================================================
+# deno
+# - インストール先を環境変数で固定（PATH 追加は別途）
+# ============================================================
+set -gx DENO_INSTALL $HOME/.deno
+
+
+# ============================================================
+# dircolors（キャッシュ）
+# - dircolors の実行は遅いので、結果をキャッシュして普段は source だけにする
+# - ~/.dir_colors を編集したら dircolors_refresh_cache を手動で実行して更新する
+# ============================================================
+set -l cache "$cachedir/fish/dircolors.fish"
+
+if test -r $cache
+    source $cache
+else
+    dircolors_refresh_cache
+    test -r $cache; and source $cache
 end
-# }}}
+
+
+# ============================================================
+# anyenv（init をキャッシュ）
+# - anyenv init は起動時に重いので、結果をキャッシュして普段は source だけにする
+# - anyenv の更新/設定変更後は anyenv_refresh_cache を手動で実行して更新する
+# ============================================================
+set -l cache "$cachedir/fish/anyenv_init.fish"
+
+if test -r $cache
+    source $cache
+else
+    anyenv_refresh_cache
+    source $cache
+end
+
+
+# ============================================================
+# PATH の重複削除（外部コマンドを使わない）
+# - anyenv 等が PATH を重ねて追加する環境向けの保険
+# - 可能なら「重複の原因を直してこの処理自体を消す」のが最速
+# ============================================================
+set -l new_path
+for p in $PATH
+    if not contains -- $p $new_path
+        set -a new_path $p
+    end
+end
+set -gx PATH $new_path
+
 
 # vim: foldmethod=marker
