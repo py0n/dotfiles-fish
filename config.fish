@@ -37,6 +37,13 @@ status --is-interactive; or exit
 # interactive shell 用の環境設定
 # ============================================================
 
+
+# --------------------------------------------------------
+# TTY 設定（Backspace/Ctrl-H）
+# --------------------------------------------------------
+stty erase (printf '\b')
+
+
 # キャッシュ保存先（XDG_CACHE_HOME 優先）
 # - dircolors / anyenv の初期化結果を保存して、普段は source だけで済ませる
 set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
