@@ -1,16 +1,18 @@
-# Defined in /var/folders/jd/dp3g4h052llfp2p75h7lq4685nprdw/T//fish.Zbij7Q/update-gotools.fish @ line 2
-function update-gotools --description 'update tools of go'
-	go get -u github.com/Songmu/make2help/cmd/make2help
-	go get -u github.com/d4l3k/go-pry
-	go get -u github.com/davecgh/go-spew/spew
-	go get -u github.com/golang/dep/cmd/dep
-	go get -u golang.org/x/lint/golint
-	go get -u github.com/jstemmer/gotags
-	go get -u github.com/k0kubun/pp
-	go get -u github.com/monochromegane/the_platinum_searcher/...
-	go get -u github.com/motemen/ghq
-	go get -u github.com/motemen/gore
-	go get -u github.com/nsf/gocode
-	go get -u github.com/rogpeppe/godef
-	go get -u golang.org/x/tools/cmd/...
+function update-gotools --description 'update tools of go (go install @latest)'
+    if not type -q go
+        return 1
+    end
+
+    go install github.com/Songmu/make2help/cmd/make2help@latest
+    go install github.com/d4l3k/go-pry@latest
+    go install github.com/davecgh/go-spew/spew@latest
+    go install golang.org/x/lint/golint@latest
+    go install github.com/jstemmer/gotags@latest
+    go install github.com/k0kubun/pp@latest
+    go install github.com/monochromegane/the_platinum_searcher/...@latest
+    go install github.com/motemen/ghq@latest
+    go install github.com/motemen/gore@latest
+    go install github.com/nsf/gocode@latest
+    go install github.com/rogpeppe/godef@latest
+    go install golang.org/x/tools/cmd/...@latest
 end
