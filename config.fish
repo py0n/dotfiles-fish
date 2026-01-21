@@ -247,10 +247,26 @@ end
 
 
 # ============================================================
-# anyenv
+# anyenv（init をキャッシュ）
 # ============================================================
+function anyenv_refresh_cache --description 'Refresh cached anyenv init script'
+    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
+    set -l cache "$cachedir/fish/anyenv_init.fish"
+    command mkdir -p (path dirname $cache)
+
+    $HOME/.anyenv/bin/anyenv init - > $cache
+end
+
 if status --is-interactive; and test -x $HOME/.anyenv/bin/anyenv
-    source (anyenv init - | psub)
+    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
+    set -l cache "$cachedir/fish/anyenv_init.fish"
+
+    if test -r $cache
+        source $cache
+    else
+        anyenv_refresh_cache
+        source $cache
+    end
 end
 
 
