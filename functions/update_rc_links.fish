@@ -1,7 +1,13 @@
-# NOTE:
-#   - 安全確認したい場合は update_rc_links_dry_run を使う
-#   - force が必要なときだけこの関数を使う
-function update_rc_links --description 'Symlink extra/rc files into $HOME (force)'
+# extra/rc 配下の設定ファイルを $HOME/.<name> に強制 symlink する
+#
+# - 起動時には呼ばない（毎回 ln -sfn すると遅く・副作用が大きい）
+# - extra/rc の中身を更新・追加したときに「手動で」実行する想定
+# - 既存の symlink / ファイルを上書きするため注意
+#
+# 例:
+#   update_rc_links
+#     -> ~/.ackrc, ~/.tmux.conf などが extra/rc の内容に同期される
+function update_rc_links --description 'Force-update symlinks from extra/rc into $HOME'
     for f in $configdir/fish/extra/rc/*
         set -l name (path basename $f)
         set -l dst  "$HOME/.$name"
