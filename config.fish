@@ -108,79 +108,6 @@ end
 # ============================================================
 # ssh-agent 管理
 # ============================================================
-
-# ------------------------------------------------------------
-# SSH_AUTH_SOCK をユーザ固定の symlink に寄せる
-# ------------------------------------------------------------
-function __set_ssh_auth_sock
-    set --local symlink $HOME/.ssh-agent-$USER
-
-    # 既存の SSH_AUTH_SOCK が symlink でなければ張り替える
-    if test -S "$SSH_AUTH_SOCK"; and not test -L "$SSH_AUTH_SOCK"
-        command ln -sfn "$SSH_AUTH_SOCK" "$symlink"
-        set --global --export SSH_AUTH_SOCK "$symlink"
-    end
-end
-
-
-# ------------------------------------------------------------
-# ssh-agent を安全に再起動する
-# ------------------------------------------------------------
-function __restart_ssh_agent
-
-    # ssh-agent が複数起動していたら全 kill
-    if type -q pgrep
-        set -l agents (pgrep -x ssh-agent)
-        if test (count $agents) -gt 1
-            command killall ssh-agent
-        end
-    else
-        if test (ps acux | grep -c '[s]sh-agent') -gt 1
-            command killall ssh-agent
-        end
-    end
-
-    # 環境変数が壊れていたら掃除
-    set --query SSH_AUTH_SOCK; or command killall ssh-agent
-    set --query SSH_AGENT_PID;  or command killall ssh-agent
-
-    # ssh-agent が動いていなければ起動
-    if type -q pgrep
-        pgrep -x ssh-agent >/dev/null; or eval (
-            command ssh-agent -c |
-            string replace --regex '\Asetenv' 'set --global --export'
-        )
-    else
-        ps acux | grep '[s]sh-agent' >/dev/null; or eval (
-            command ssh-agent -c |
-            string replace --regex '\Asetenv' 'set --global --export'
-        )
-    end
-
-    # PID を再設定
-    if type -q pgrep
-        set --global --export SSH_AGENT_PID (pgrep -nx ssh-agent)
-    else
-        set --global --export SSH_AGENT_PID (
-            ps acux | grep '[s]sh-agent' | awk '{split($0,e," *");print e[2]}'
-        )
-    end
-end
-
-
-# ============================================================
-# ssh-agent（必要時のみ）
-# ============================================================
-function reset_ssh_auth_sock
-    # SSH 接続中でなければ agent を再起動
-    set --query SSH_CONNECTION
-    if test $status -gt 0
-        __restart_ssh_agent
-    end
-
-    __set_ssh_auth_sock
-end
-
 if status --is-interactive
     # 既に SSH_AUTH_SOCK が有効なら何もしない
     if set -q SSH_AUTH_SOCK; and test -S "$SSH_AUTH_SOCK"
@@ -208,14 +135,6 @@ end
 # ============================================================
 # $HOME 以下への rc ファイル展開（初回のみ）
 # ============================================================
-function update_rc_links --description 'Symlink extra/rc files into $HOME (force)'
-    for f in $configdir/fish/extra/rc/*
-        set -l name (path basename $f)
-        set -l dst  "$HOME/.$name"
-        command ln -sfn $f $dst
-    end
-end
-
 if status --is-interactive
     # すでに存在するものは触らない（起動を軽くする）
     for f in $configdir/fish/extra/rc/*
@@ -239,21 +158,6 @@ end
 # ============================================================
 # dircolors（キャッシュ）
 # ============================================================
-function dircolors_refresh_cache --description 'Refresh cached dircolors (fish)'
-    if not type -q dircolors; or not test -f $HOME/.dir_colors
-        return 0
-    end
-
-    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
-    set -l cache "$cachedir/fish/dircolors.fish"
-    command mkdir -p (path dirname $cache)
-
-    # dircolors -c は csh 形式 (setenv) なので fish の set に変換して保存
-    dircolors -c $HOME/.dir_colors \
-        | string replace -r '^setenv ([A-Z_]+) ' 'set -gx $1 ' \
-        > $cache
-end
-
 if status --is-interactive
     set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
     set -l cache "$cachedir/fish/dircolors.fish"
@@ -270,14 +174,6 @@ end
 # ============================================================
 # anyenv（init をキャッシュ）
 # ============================================================
-function anyenv_refresh_cache --description 'Refresh cached anyenv init script'
-    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
-    set -l cache "$cachedir/fish/anyenv_init.fish"
-    command mkdir -p (path dirname $cache)
-
-    $HOME/.anyenv/bin/anyenv init - > $cache
-end
-
 if status --is-interactive; and test -x $HOME/.anyenv/bin/anyenv
     set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
     set -l cache "$cachedir/fish/anyenv_init.fish"
