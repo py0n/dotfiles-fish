@@ -237,11 +237,32 @@ end
 
 
 # ============================================================
-# dircolors
+# dircolors（キャッシュ）
 # ============================================================
+function dircolors_refresh_cache --description 'Refresh cached dircolors (fish)'
+    if not type -q dircolors; or not test -f $HOME/.dir_colors
+        return 0
+    end
+
+    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
+    set -l cache "$cachedir/fish/dircolors.fish"
+    command mkdir -p (path dirname $cache)
+
+    # dircolors -c は csh 形式 (setenv) なので fish の set に変換して保存
+    dircolors -c $HOME/.dir_colors \
+        | string replace -r '^setenv ([A-Z_]+) ' 'set -gx $1 ' \
+        > $cache
+end
+
 if status --is-interactive
-    if test -f $HOME/.dir_colors; and type -q dircolors
-        eval (dircolors -c $HOME/.dir_colors)
+    set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
+    set -l cache "$cachedir/fish/dircolors.fish"
+
+    if test -r $cache
+        source $cache
+    else
+        dircolors_refresh_cache
+        test -r $cache; and source $cache
     end
 end
 
