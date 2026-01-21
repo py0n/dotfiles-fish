@@ -63,8 +63,21 @@ function fish_prompt --description 'Write out the prompt'
     echo -n (prompt_pwd)
     set_color normal
 
-    # VCS（git 等）
-    printf '%s ' (__fish_vcs_prompt)
+    # --------------------------------------------------------
+    # VCS プロンプトは指定ディレクトリ配下のみ有効
+    #   - ~/pj/**
+    #   - ~/.config/fish/**
+    #   - ~/.config/nvim/**
+    # --------------------------------------------------------
+    set -l pwd (pwd)
+
+    if string match -q "$HOME/pj/*" -- $pwd; or \
+        string match -q "$HOME/.config/fish" -- $pwd; or \
+        string match -q "$HOME/.config/fish/*" -- $pwd; or \
+        string match -q "$HOME/.config/nvim" -- $pwd; or \
+        string match -q "$HOME/.config/nvim/*" -- $pwd
+        printf '%s ' (__fish_vcs_prompt)
+    end
 
     # エラーなら色を変える
     if test $last_status -ne 0
