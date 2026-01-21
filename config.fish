@@ -34,6 +34,10 @@ status --is-interactive; or exit
 # interactive shell 用の環境設定
 # ============================================================
 
+# キャッシュディレクトリの設定
+set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
+
+
 # --------------------------------------------------------
 # fish 4.3+ frozen 設定の吸収
 # --------------------------------------------------------
@@ -133,7 +137,6 @@ set -gx DENO_INSTALL $HOME/.deno
 # ============================================================
 # dircolors（キャッシュ）
 # ============================================================
-set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
 set -l cache "$cachedir/fish/dircolors.fish"
 
 if test -r $cache
@@ -147,7 +150,6 @@ end
 # ============================================================
 # anyenv（init をキャッシュ）
 # ============================================================
-set -l cachedir (set -q XDG_CACHE_HOME; and echo $XDG_CACHE_HOME; or echo "$HOME/.cache")
 set -l cache "$cachedir/fish/anyenv_init.fish"
 
 if test -r $cache
