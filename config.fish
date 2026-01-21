@@ -196,25 +196,11 @@ end
 # resources/*.fish のロード
 # ============================================================
 if status --is-interactive
-    # 任意の拡張設定を resources/ 以下に分離
-    for f in {$configdir}/fish/resources/*.fish
-        source $f
-    end
+    set -l resdir $configdir/fish/resources
 
-    # resource を一時的に無効化
-    function resource_disable -a name
-        set -l f {$configdir}/fish/resources/{$name}.fish
-        if test -f $f
-            command mv $f {$f}_
-        end
-    end
-
-    # 無効化した resource を再有効化
-    function resource_enable -a name
-        set -l f {$configdir}/fish/resources/{$name}.fish_
-        if test -f $f
-            command mv $f {$configdir}/fish/resources/{$name}.fish
-        end
+    # 必要なものだけ読み込む
+    if test -r "$resdir/informative_vcs.fish"
+        source "$resdir/informative_vcs.fish"
     end
 end
 
