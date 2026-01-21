@@ -1,33 +1,66 @@
 #!/usr/bin/env fish
-# git-sync (fish version)
-#
-# cf. https://qiita.com/masarakki/items/27f2cb456b4801ccb31b
-#
+# git-sync (fish version) — main/master 自動判定対応
 
 command git fetch --all --prune
 
-set -l modifieds (command git status --porcelain --untracked-files=no | string length)
+# ワーキングツリーの差分を取得（空なら ''）
+set -l modifieds (command git status --porcelain --untracked-files=no)
 
-if count $modifieds >/dev/null 2>&1
+# 必要なら一時退避
+if test -n "$modifieds"
     command git stash
 end
 
-set -l current (command git branch | string match --entire --regex '^\* ' | string split ' ')[2]
+# 現在のブランチを保存
+set -l current (command git rev-parse --abbrev-ref HEAD)
 
-command git checkout main 2>/dev/null; or command git checkout master 2>/dev/null
+# デフォルトブランチを推定する:
+# 1) origin/HEAD があればそこから（例: origin/main -> main）
+# 2) local に main があれば main
+# 3) local に master があれば master
+# 4) 最終フォールバックは main
+set -l default_branch ''
+
+if command git rev-parse --abbrev-ref origin/HEAD >/dev/null 2>&1
+    set default_branch (command git rev-parse --abbrev-ref origin/HEAD | string replace -r '^origin/' '')
+end
+
+if test -z "$default_branch"
+    if command git show-ref --verify --quiet refs/heads/main >/dev/null 2>&1
+        set default_branch main
+    else if command git show-ref --verify --quiet refs/heads/master >/dev/null 2>&1
+        set default_branch master
+    else
+        set default_branch main
+    end
+end
+
+# デフォルトブランチへ移動して pull
+command git checkout $default_branch 2>/dev/null; or command git checkout origin/$default_branch 2>/dev/null
 command git pull --rebase
 
+# マージ済みブランチを削除（現在の branch とデフォルトブランチは除外）
 for b in (command git branch --no-color --merged | string match --entire --invert --regex '^\* ' | string trim)
-    command git branch -d $b
+    if test "$b" != "$current" -a "$b" != "$default_branch"
+        command git branch -d $b
+    end
 end
 
-for b in (command git branch --no-color -vv | string match --entire --regex '\[[A-Za-z0-9_\/\.\-]*: gone\]' | string trim)
-    command git branch -D  (string split --max 1 ' ' $b)[1]
+# リモート追跡が gone になったブランチを強制削除（デフォルトは除外）
+for line in (command git branch --no-color -vv | string match --entire --regex '\[[A-Za-z0-9_\/\.\-]*: gone\]' | string trim)
+    set -l bn (string split --max 1 ' ' $line)[1]
+    if test "$bn" != "$default_branch" -a "$bn" != "$current"
+        command git branch -D $bn
+    end
 end
 
-
+# 元のブランチに戻す。stash があれば pop、失敗時は drop
 if command git checkout $current
-    count $modifieds >/dev/null 2>&1; and command git stash pop
+    if test -n "$modifieds"
+        command git stash pop
+    end
 else
-    count $modifieds >/dev/null 2>&1; and command git stash drop
+    if test -n "$modifieds"
+        command git stash drop
+    end
 end
