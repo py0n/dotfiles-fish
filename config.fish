@@ -168,9 +168,9 @@ function __restart_ssh_agent
 end
 
 
-# ------------------------------------------------------------
-# ssh-agent 初期化エントリポイント
-# ------------------------------------------------------------
+# ============================================================
+# ssh-agent（必要時のみ）
+# ============================================================
 function reset_ssh_auth_sock
     # SSH 接続中でなければ agent を再起動
     set --query SSH_CONNECTION
@@ -182,7 +182,13 @@ function reset_ssh_auth_sock
 end
 
 if status --is-interactive
-    reset_ssh_auth_sock
+    # 既に SSH_AUTH_SOCK が有効なら何もしない
+    if set -q SSH_AUTH_SOCK; and test -S "$SSH_AUTH_SOCK"
+        # OK
+    else
+        # sock が無い/死んでる時だけ起動・修復
+        reset_ssh_auth_sock
+    end
 end
 
 
