@@ -206,12 +206,24 @@ end
 
 
 # ============================================================
-# $HOME 以下への rc ファイル展開
+# $HOME 以下への rc ファイル展開（初回のみ）
 # ============================================================
+function update_rc_links --description 'Symlink extra/rc files into $HOME (force)'
+    for f in $configdir/fish/extra/rc/*
+        set -l name (path basename $f)
+        set -l dst  "$HOME/.$name"
+        command ln -sfn $f $dst
+    end
+end
+
 if status --is-interactive
-    # ~/.config/fish/extra/rc/* を ~/.<name> に symlink
-    for f in {$configdir}/fish/extra/rc/*
-        ln -sfn $f $HOME/.(string split '/' $f)[-1]
+    # すでに存在するものは触らない（起動を軽くする）
+    for f in $configdir/fish/extra/rc/*
+        set -l name (path basename $f)
+        set -l dst  "$HOME/.$name"
+        if not test -e $dst
+            command ln -s $f $dst
+        end
     end
 end
 
