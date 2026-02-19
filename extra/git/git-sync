@@ -49,7 +49,7 @@ end
 # リモート追跡が gone になったブランチを強制削除（デフォルトは除外）
 for line in (command git branch --no-color -vv | string match --entire --regex '\[[A-Za-z0-9_\/\.\-]*: gone\]' | string trim)
     set -l bn (string split --max 1 ' ' $line)[1]
-    if test "$bn" != "$default_branch" -a "$bn" != "$current"
+    if test "$bn" != "$default_branch"
         command git branch -D $bn
     end
 end
