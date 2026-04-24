@@ -1,3 +1,5 @@
 *.swp
 .envrc
-.local.vim
+.go-version
+.local.lua*
+.local.vim*
